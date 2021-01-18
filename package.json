@@ -1,11 +1,11 @@
 {
-  "name": "this-package",
+  "name": "improved-record",
   "version": "1.0.0",
-  "description": "Short description.",
+  "description": "Lightweight wrapper around immutable.js Record to make it better for TypeScript usage.",
   "main": "dist/index.js",
   "unpkg": "dist/index.min.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/iansan5653/this-package",
+  "repository": "https://github.com/iansan5653/improved-immutable-record",
   "scripts": {
     "build": "tsc",
     "minify": "node-minify --compressor uglify-es --input dist/index.js --output dist/index.min.js",
@@ -46,7 +46,9 @@
     "ts-mocha": "^6.0.0",
     "typescript": "^3.5.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "immutable-js": "^0.3.1-6"
+  },
   "nyc": {
     "include": [
       "src/**/*.ts",
@@ -70,25 +72,8 @@
     "dist/index.min.js"
   ],
   "keywords": [
-    "keywords"
-  ],
-  "greenkeeper": {
-    "commitMessages": {
-      "initialBadge": "Add Greenkeeper badge",
-      "initialDependencies": "Update dependencies",
-      "initialBranches": "Whitelist greenkeeper branches",
-      "dependencyUpdate": "Update ${dependency} to version ${version}",
-      "devDependencyUpdate": "Update ${dependency} to version ${version}",
-      "dependencyPin": "Pin ${dependency} to ${oldVersion}",
-      "devDependencyPin": "Pin ${dependency} to ${oldVersion}"
-    },
-    "prTitles": {
-      "initialPR": "Update dependencies to enable Greenkeeper",
-      "initialPrBadge": "Add badge to enable Greenkeeper",
-      "initialPrBadgeOnly": "Add Greenkeeper badge",
-      "initialSubgroupPR": "Update dependencies for ${group}",
-      "basicPR": "Update ${dependency} to the latest",
-      "groupPR": "Update ${dependency} in group ${group} to the latest"
-    }
-  }
+    "immutable",
+    "record",
+    "typescript"
+  ]
 }
