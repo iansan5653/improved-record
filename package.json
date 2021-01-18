@@ -47,7 +47,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "immutable-js": "^0.3.1-6"
+    "immutable": "^4.0.0-rc.12"
   },
   "nyc": {
     "include": [
