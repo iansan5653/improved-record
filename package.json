@@ -1,6 +1,6 @@
 {
   "name": "improved-record",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight wrapper around immutable.js Record to make it better for TypeScript usage.",
   "main": "dist/index.js",
   "unpkg": "dist/index.min.js",

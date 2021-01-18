@@ -17,12 +17,12 @@ way.
 
 |                                               | immutable.js `Record` | `ImprovedRecord`              |
 | --------------------------------------------- | --------------------- | ----------------------------- |
-| Properties can be declared without defaults   | ❌                    | ✔                             |
-| Properties can be deleted (reset to default)  | ✔                     | Only properties with defaults |
-| Shape easily defined by TypeScript interfaces | ✔                     | ✔                             |
-| 100% safe at runtime                          | ✔                     | ❌                            |
-| 100% safe at compile-time                     | ✔                     | ✔                             |
-| Completely immutable                          | ✔                     | ✔                             |
+| Properties can be declared without defaults   | ❌                    | ✅                            |
+| Properties can be deleted (reset to default)  | ✅                    | Only properties with defaults |
+| Shape easily defined by TypeScript interfaces | ✅                    | ✅                            |
+| 100% safe at runtime                          | ✅                    | ❌                            |
+| 100% safe at compile-time                     | ✅                    | ✅                            |
+| Completely immutable                          | ✅                    | ✅                            |
 
 ## Getting Started
 
