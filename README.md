@@ -52,8 +52,8 @@ Here are all the differences:
   interface (properties defined like `property?: Type`).
 - When creating factories, all required properties must have their default set to the unique
   `required` symbol. This is required because of how immutable.js works behind the scenes.
-- `undefined` cannot be used as a default property (use `null` instead). `undefined` can still be
-  used as a type for properties without default values.
+- `undefined` cannot be used as a default value or as a value for required types. Use `null`
+  instead.
 - When creating record instances, all properties without default values (required properties in the
   shape interface) are required. Properties with default values can still be overridden.
 - When calling `delete` or `remove` on an instance, only properties with defaults (optional
@@ -80,8 +80,8 @@ interface PersonProps {
   username: string;
   // Properties marked optional will always have a default value defined.
   level?: "admin" | "user";
-  // Properties marked `| undefined` are still required, but can be explicitly set to `undefined`.
-  gender: string | undefined;
+  // The `| undefined` here will have no effect as `undefined` is not a valid value.
+  displayName: string | undefined;
   // For truly optional properties, `null` can be used as the default value. `undefined` cannot be
   // the default value.
   age?: number | null;
@@ -93,8 +93,8 @@ const Person = ImprovedRecord<PersonProps>({
   username: required,
   // Any optional property *must* have a default value.
   level: "user",
-  // Even though `gender` can be set to `undefined`, it is still a required property (no `?`).
-  gender: required,
+  // Even though `displayName` has `| undefined`, it is still a required property (no `?:`).
+  displayName: required,
   age: null
 });
 
@@ -115,7 +115,8 @@ import Person from "Person";
 const samplePerson = Person({
   // Required properties must be defined.
   username: "sample123",
-  gender: undefined
+  // `displayName` cannot be set to `undefined`
+  displayName: "unknown"
   // `age` and `level` don't have to be set because they have defaults.
 });
 

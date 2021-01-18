@@ -133,18 +133,14 @@ context("ImprovedRecord", function(): void {
       assert.strictEqual(sample.d, 2);
     });
 
-    it("should allow explicit `undefined`", function(): void {
-      const sample = ShapeRecord({
+    it("(type) should disallow explicit `undefined`", function(): void {
+      ShapeRecord({
         a: 1,
         b: 2,
         c: 2,
+        // @ts-expect-error
         d: undefined
       });
-
-      assert.strictEqual(sample.a, 1);
-      assert.strictEqual(sample.b, 2);
-      assert.strictEqual(sample.c, 2);
-      assert.strictEqual(sample.d, undefined);
     });
 
     it("should remove optionality from values with defaults", function(): void {

@@ -28,8 +28,8 @@ export const required = Symbol("Required Value (No Default Available)");
 export function ImprovedRecord<Shape extends {}>(
   defaults: DefaultsFor<Shape>,
   name?: string
-): ImprovedRecordFactory<Shape> {
-  return Record(defaults as Required<Shape>, name);
+): ImprovedRecordFactory<NoExplicitUndefined<Shape>> {
+  return Record(defaults, name) as any;
 }
 
 export interface ImprovedRecordFactory<Shape> {
@@ -79,6 +79,11 @@ type OptionalKey<T> = {[K in keyof T]-?: {} extends Pick<T, K> ? K : never}[keyo
 type DefaultsFor<Shape> = {
   [K in keyof Shape]-?: K extends OptionalKey<Shape> ? Shape[K] : typeof required;
 };
+
+/**
+ * Removes `undefined` from every property while maintaining optionality.
+ */
+type NoExplicitUndefined<T> = {[K in keyof T]: Exclude<T[K], undefined>};
 
 interface ImprovedRecordCore<Shape>
   extends Omit<Record<Required<Shape>>, "delete" | "remove" | "clear" | "deleteIn" | "removeIn"> {
