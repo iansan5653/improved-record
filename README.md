@@ -1,5 +1,7 @@
 # Improved Immutable Record
 
+[![Build Status](https://dev.azure.com/iansan56530971/improved-record/_apis/build/status/iansan5653.improved-record?branchName=master)](https://dev.azure.com/iansan56530971/improved-record/_build/latest?definitionId=1&branchName=master)
+
 `ImprovedRecord` is a lightweight wrapper around the
 [immutable.js](https://immutable-js.github.io/immutable-js/) `Record` type. This is intended _only_
 for use with TypeScript, as it takes advantage of the type system to ensure safety while allowing
