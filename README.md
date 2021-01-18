@@ -1,137 +1,128 @@
-# Project Boilerplate
+# Improved Immutable Record
 
-This is the boilerplate file structure I use to start all of my TypeScript / NPM
-projects. It includes:
-* `eslintrc.json` - Tons of rules for ESLint, including TypeScript, Mocha, and
-  JSDoc-specific rules. Extends from reccomended rulesets and from Google style.
-* `.gitignore` - GitHub's default Node.js gitignore with some specific items
-  to exclude test results, output, and coverage results.
-* `.azure-pipelines.yml` - Setup for continuous integration with Azure
-  Pipelines. Runs and reports TypeScript compile, ESLint check, Mocha tests,
-  and coverage results on Ubuntu.
-* `changelog.md` - Standard template for changelogs.
-* `license.md` - MIT License. If you are not me, change the name.
-* `package.json` - Standard package.json but with some added stuff:
-  * `name` - Update this.
-  * `version` - Start with 1.0.0 and use semantic versioning. Add changelog notes per version.
-  * `description` - Use the same as the GitHub short description.
-  * `repository` - Update to repo url.
-  * `scripts` - Don't change this. For most of the scripts, see the notes below which I'd leave in the readme. Not included below are:
-    * `testForCheck` - Only needed for the `check` task. Skips compile and outputs short summary.
-    * `testForCI` - Used by Azure Pipelines. Skips compile and outputs report.
-    * `ensureCleanTree` - Used by `prepublishOnly` task. Ensures git working tree is clean before publishing a new version.
-    * `prepublishOnly` - Runs checks, compiles, minifies before publishing a new version.
-    * `postpublish` - Pushes a new version tag to GitHub after publishing.
-  * `author` - Update this if you're not me.
-  * `devDependencies` - Explanations:
-    * `@node-minify/cli` - CLI for generating minified files for web.
-    * `@node-minify/core` - For generating minified files for web.
-    * `@node-minify/uglify-es` - Engine for generating minified files for web.
-    * `@types/mocha` - Type definitions for Mocha.
-    * `@types/node` - Type definitions for Node.
-    * `@typescript-eslint/eslint-plugin` - ESLint plugin for typescript.
-    * `@typescript-eslint/parser` - ESLint parser for TypeScript.
-    * `cross-var` - Used to make NPM task variables work on Linux and Windows.
-    * `eslint` - For code linting.
-    * `eslint-config-google` - Google default style guide.
-    * `eslint-plugin-jsdoc` - JSDoc plugin for ESLint.
-    * `eslint-plugin-mocha` - Mocha plugin for ESLint.
-    * `mocha` - Mocha test library.
-    * `mocha-junit-reporter` - For generating report files for Azure Pipelines.
-    * `nyc` - For generating coverage reports.
-    * `prettier` - For prettifying code files.
-    * `source-map-support` - For generating sourcemaps with TypeScript.
-    * `ts-mocha` - For running tests without having to compile TypeScript (uses ts-node).
-    * `typescript` - TypeScript compiler.
-  * `files` - If your module has more (non-test) files than `index.ts`, include them and all derivatives here.
-  * `keywords` - Update this.
+`ImprovedRecord` is a lightweight wrapper around the
+[immutable.js](https://immutable-js.github.io/immutable-js/) `Record` type. This is intended _only_
+for use with TypeScript, as it takes advantage of the type system to ensure safety while allowing
+for more flexible use.
 
-I always include a short description of the project here; maybe a quick example
-or two.
+The primary benefit of `ImprovedRecord` is the ability to declare properties that do not have a
+default value. These properties are required to be set when creating a new record instance, and they
+cannot be deleted (only changed).
 
-The following sections are always included with minor changes. Find and replace
-`this-module` with the module name.
+`ImprovedRecord` is inspired by Scala's
+[case classes](https://docs.scala-lang.org/tour/case-classes.html), which work in a very similar
+way.
+
+## Comparison with immutable.js `Record`
+
+|                                               | immutable.js `Record` | `ImprovedRecord`              |
+| --------------------------------------------- | --------------------- | ----------------------------- |
+| Properties can be declared without defaults   | ❌                    | ✔                             |
+| Properties can be deleted (reset to default)  | ✔                     | Only properties with defaults |
+| Shape easily defined by TypeScript interfaces | ✔                     | ✔                             |
+| 100% safe at runtime                          | ✔                     | ❌                            |
+| 100% safe at compile-time                     | ✔                     | ✔                             |
+| Completely immutable                          | ✔                     | ✔                             |
 
 ## Getting Started
 
-`this-module` is a UMD module, so it can be used in Node or on the web. Typings are
-included for TypeScript as well.
+### Installation
 
-### Usage in Node.JS
+#### NPM
 
-`this-module` is hosted on [npm](https://www.npmjs.com/this-module), so you can install
-with:
-
-```bash
-npm i this-module
+```
+npm i improved-record
 ```
 
-To use in code:
+#### Yarn
 
-```js
-import defaultExport from "this-module";
-
-defaultExport();
+```
+yarn add improved-record
 ```
 
-Or:
+### Usage
 
-```js
-import {exportA, exportB, exportC} from "this-module";
+The API for `ImprovedRecord` is almost exactly the same as the API for the original
+[`Record`](https://immutable-js.github.io/immutable-js/docs/#/Record).
 
-exportC(exportB(exportA()));
+Here are all the differences:
+
+- The shape interface type parameter is required (cannot be correctly inferred).
+- When creating factories, default values can only be specified for optional properties on the shape
+  interface (properties defined like `property?: Type`).
+- When creating factories, all required properties must have their default set to the unique
+  `required` symbol. This is required because of how immutable.js works behind the scenes.
+- `undefined` cannot be used as a default property (use `null` instead). `undefined` can still be
+  used as a type for properties without default values.
+- When creating record instances, all properties without default values (required properties in the
+  shape interface) are required. Properties with default values can still be overridden.
+- When calling `delete` or `remove` on an instance, only properties with defaults (optional
+  properties in the shape interface) may be deleted. Names of properties without defaults cannot be
+  passed.
+- The `clear` method is not available (because there are no default values for some properties).
+- The `deleteIn` and `removeIn` methods are not available (because there is no way to safely type-
+  check these methods and prevent required properties from being deleted).
+
+That's it! Everything else is the same.
+
+### Example
+
+Here's a full example with a sample `Person` record:
+
+#### Defining a factory
+
+```ts
+import {ImprovedRecord, ImprovedRecordOf, required} from "improved-immutable-record";
+
+// The props interface is required (cannot be correctly inferred from the default values):
+interface PersonProps {
+  // For required properties like this, no default value will be defined.
+  username: string;
+  // Properties marked optional will always have a default value defined.
+  level?: "admin" | "user";
+  // Properties marked `| undefined` are still required, but can be explicitly set to `undefined`.
+  gender: string | undefined;
+  // For truly optional properties, `null` can be used as the default value. `undefined` cannot be
+  // the default value.
+  age?: number | null;
+}
+
+// Now create the record factory. Providing the props interface is required.
+const Person = ImprovedRecord<PersonProps>({
+  // Set required properties to the unique `required` symbol.
+  username: required,
+  // Any optional property *must* have a default value.
+  level: "user",
+  // Even though `gender` can be set to `undefined`, it is still a required property (no `?`).
+  gender: required,
+  age: null
+});
+
+// Define the record instance type with the same name as the record factory (this is optional but
+// makes it much easier to work with and helps to avoid accidentally using `PersonProps` instead of
+// `Person`.
+type Person = ImprovedRecordOf<PersonProps>;
+
+export default Person;
 ```
 
-### Usage in the Browser
+#### Using the factory
 
-You can embed it (minified) on a webpage with
-[RequireJS](https://requirejs.org/). The module is available on
-[UNPKG](https://unpkg.com) at https://unpkg.com/this-module:
+```ts
+import Person from "Person";
 
-```html
-<script>
-  require(["https://unpkg.com/this-module^1.0.0/dist/index.min.js"], function(thisModule) {
-    thisModule.exportA();
-  });
-</script>
+// Using the factory method:
+const samplePerson = Person({
+  // Required properties must be defined.
+  username: "sample123",
+  gender: undefined
+  // `age` and `level` don't have to be set because they have defaults.
+});
+
+// `Person` is also a type due to declaration merging:
+const doSomething = (person: Person): void => {
+  /* ... */
+};
+
+doSomething(samplePerson);
 ```
-
-<!-- Possibly remove if module is single-file -->
-_Note_: Importing via the 'bare' url (`https://unpkg.com/this-module`) is not
-supported as it breaks references to other required files.
-
-## Usage
-
-Describe usage with examples.
-
-## Contributing
-
-Found a bug? Please,
-[submit it here.](https://github.com/iansan5653/this-module/issues)
-
-Pull requests are always welcome, although to increase your chances of your
-contribution being accepted, opening an issue and linking to it is always a
-good idea.
-
-Pull requests will not be merged unless the Azure Pipelines build succeeds.
-This means that all checks must pass and code must be free of lint errors. To
-quickly confirm that it will, just run:
-
-```bash
-npm run check
-```
-
-This checks your formatting, tests, and for TypeScript compiler errors. If the
-task doesn't fail, you should be good to go.
-
-### Other Tasks
-
-For your convenience, some other tasks are also provided in the `package.json`:
-
-- `npm run build` - Compiles TypeScript code to JavaScript
-- `npm run minify` - Generate minified JavaScript files from compiled files
-- `npm run test` - Quickly run tests using TypeScript code without compiling
-- `npm run testWithCoverage` - Run tests and generate coverage report
-- `npm run lint` - Check code for linting errors
-- `npm run check` - Check to ensure code will pass Pipelines checks (see above)
-- `npm run format` - Format code using Prettier
