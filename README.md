@@ -74,7 +74,7 @@ Here's a full example with a sample `Person` record:
 #### Defining a factory
 
 ```ts
-import {ImprovedRecord, ImprovedRecordOf, required} from "improved-immutable-record";
+import {ImprovedRecord, ImprovedRecordOf, required} from "improved-record";
 
 // The props interface is required (cannot be correctly inferred from the default values):
 interface PersonProps {
